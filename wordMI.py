@@ -27,9 +27,9 @@ languagename 		= "english-encarta"
 #languagename 		= "english"
 
 
-#shortfilename 		= "french"
-#outshortfilename 	= "french"
-#languagename 		= "french"
+shortfilename 		= "french"
+outshortfilename 	= "french"
+languagename 		= "french"
 
 #shortfilename 		= "dutch"
 #outshortfilename 	= "dutch"
@@ -64,9 +64,10 @@ infileTrigramsname 	= ngramfolder + shortfilename    + "_trigrams.txt"
 infileWordsname 	= ngramfolder   + shortfilename    + "_words.txt" 
 outfilenameLatex 	= outfolder     + outshortfilename + "_latex.tex"
  
-print "\n\nI am looking for: ", infileBigramsname, " and ", infileTrigramsname
-print "\n\nI am printing to: ", outfilenameLatex
- 
+print "--------------------------------------------------------------"
+print "I am looking for: ", infileBigramsname, " and \n\t\t   ", infileTrigramsname
+print "I am printing to: ", outfilenameLatex
+print "--------------------------------------------------------------" 
 
 
 unicodeFlag = False
@@ -110,14 +111,13 @@ print "Language is", languagename, ". File name:", shortfilename
 #---------------------------------------------------------------------------#
 totalwordcount = 0
 for line in wordfile:
-	#print  "A", line
 	pieces = line.split()
 	if pieces[0] == "#":
 		continue
 	Words[pieces[0]] = int(pieces[1])
 	WordList.append(pieces[0])	
 	totalwordcount += int(pieces[1])	 
-print "1. Word file is ", infileWordsname		
+print "1. Word file is ", infileWordsname, " \nWord count: ", totalwordcount		
 wordfile.close()
 
 wordlist = sorted(Words,key=Words.__getitem__,reverse=True)
