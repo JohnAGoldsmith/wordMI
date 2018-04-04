@@ -6,13 +6,13 @@ import sys
 #---------------------------------------------------------------------------#
 #	Language name parameters
 #---------------------------------------------------------------------------#
-keyword = "" 
+keyword = "house" 
 NumberOfRows = 25
 
 if len(sys.argv) == 2:
 	keyword = sys.argv[1]
  
-print "keyword", keyword
+print   keyword
 
 shortfilename 		= "english-encarta"
 outshortfilename 	= "english-encarta"
@@ -27,9 +27,9 @@ languagename 		= "english-encarta"
 #languagename 		= "english"
 
 
-shortfilename 		= "french"
-outshortfilename 	= "french"
-languagename 		= "french"
+#shortfilename 		= "french"
+#outshortfilename 	= "french"
+#languagename 		= "french"
 
 #shortfilename 		= "dutch"
 #outshortfilename 	= "dutch"
@@ -114,6 +114,7 @@ for line in wordfile:
 	pieces = line.split()
 	if pieces[0] == "#":
 		continue
+	#print line
 	Words[pieces[0]] = int(pieces[1])
 	WordList.append(pieces[0])	
 	totalwordcount += int(pieces[1])	 
@@ -168,6 +169,8 @@ print >>outfileLatex, "%",  infileWordsname
 print >>outfileLatex, "\\documentclass{article}" 
 print >>outfileLatex, "\\usepackage{booktabs}" 
 print >>outfileLatex, "\\usepackage{geometry}"
+print >>outfileLatex, "\\usepackage[group-separator={,}]{siunitx}" # to put commas in big numbers;
+print >>outfileLatex, "\\usepackage{geometry}"
 print >>outfileLatex, "\\geometry{lmargin=.5in,rmargin=.5in,tmargin=.55in,bmargin=.55in}"
 print >>outfileLatex, "\\begin{document}" 
 
@@ -220,13 +223,16 @@ for i in range(len(BigramList)):
 	if word1 not in Words or word2 not in Words: continue 
 	freq1 = float(Words[word1]) / totalwordcount
 	freq2 = float(Words[word2]) / totalwordcount
-	MI =  math.log(  float(Bigrams[bigram])/totalbigramcount / (freq1 * freq2)  ,2 )
+	bigram_count = float(Bigrams[bigram])
+	bigram_frequency = bigram_count/totalbigramcount
+	plog = math.log (totalbigramcount/bigram_count,2)
+	MI =    math.log(  float(Bigrams[bigram])/totalbigramcount / (freq1 * freq2)  ,2 )
 	WMI = MI * Bigrams[bigram]
-	data.append((i+1, bigram , Bigrams[bigram], float(Bigrams[bigram])/totalbigramcount,  math.log(  float(Bigrams[bigram])/totalbigramcount,2 ), MI, WMI ))
+	data.append((i+1, bigram , bigram_count, bigram_frequency, plog , MI, WMI ))
 
 for i in range(NumberOfRows):
-	(i, bigram, count,frequency,plog, MI, WMI) = data[i]
-	print >>outfileLatex,  "%5d & %10s & %10d & %10.6f & %10.3f & %10.3f & %10.3f\\\\ " % (i, bigram, count, frequency, plog,MI, WMI) 
+	(i, bigram, bigram_count,bigram_frequency,plog, MI, WMI) = data[i]
+	print >>outfileLatex,  "%5d & %10s & %10d & %10.6f & %10.3f & %10.3f & %10.3f\\\\ " % (i, bigram, bigram_count, bigram_frequency, plog,MI, WMI) 
 
 print >>outfileLatex, "\\bottomrule \n \\end{tabular}", "\n\n"
 print >>outfileLatex, "\\newpage" 
@@ -243,8 +249,8 @@ print >>outfileLatex, "\\begin{tabular}{llllllll}\\toprule"
 print >>outfileLatex, "   rank & bigram & count & frequency & plog   & MI & weighted MI \\\\ \\midrule "
 data.sort(key = lambda item:item[5]) 
 for i in range(NumberOfRows):
-	(i, bigram, count,frequency,plog, MI, WMI) = data[i]
-	print >>outfileLatex,  "%5d & %10s & %10d & %10.6f & %10.3f & %10.3f & %10.1f\\\\ " % (i, bigram, count, frequency, plog,MI, WMI) 
+	(i, bigram, bigram_count,bigram_frequency,plog, MI, WMI) = data[i]
+	print >>outfileLatex,  "%5d & %10s & %10d & %14.6f & %10.3f & %10.3f & %10.1f\\\\ " % (i, bigram, bigram_count, bigram_frequency, plog,MI, WMI) 
 print >>outfileLatex, "\\bottomrule \n \\end{tabular}", "\n\n"
 print >>outfileLatex, "\\newpage" 
  
@@ -256,8 +262,8 @@ print >>outfileLatex, "\\begin{tabular}{llllllll}\\toprule"
 print >>outfileLatex, "   rank & bigram & count & frequency & plog   & MI & weighted MI \\\\ \\midrule "
 data.sort(key = lambda item:item[5], reverse=True) 
 for i in range(NumberOfRows):
-	(i, bigram, count,frequency,plog, MI, WMI) = data[i]
-	print >>outfileLatex,  "%5d & %10s & %10d & %10.6f & %10.3f & %10.3f & %10.1f\\\\ " % (i, bigram, count, frequency, plog,MI, WMI) 
+	(i, bigram, bigram_count,bigram_frequency,plog, MI, WMI) = data[i]
+	print >>outfileLatex,  "%5d & %10s & %10d & %15.6f & %10.3f & %10.3f & %10.1f\\\\ " % (i, bigram, bigram_count, bigram_frequency, plog,MI, WMI) 
 print >>outfileLatex, "\\bottomrule \n \\end{tabular}", "\n\n"
 print >>outfileLatex, "\\newpage" 
  
@@ -270,7 +276,7 @@ print >>outfileLatex, "   rank & bigram & count & frequency & plog   & MI & weig
 data.sort(key = lambda item:item[6], reverse=True) 
 for i in range(NumberOfRows):
 	(i, bigram, count,frequency,plog, MI, WMI) = data[i]
-	print >>outfileLatex,  "%5d & %10s & %10d & %10.6f & %10.3f & %10.3f & %10.1f\\\\ " % (i, bigram, count, frequency, plog,MI, WMI) 
+	print >>outfileLatex,  "%5d & %10s & %10d & %10.6f & %10.3f & %10.3f & %10.1f\\\\ " % (i, bigram, bigram_count, bigram_frequency, plog,MI, WMI) 
 print >>outfileLatex, "\\bottomrule \n \\end{tabular}", "\n\n"
 print >>outfileLatex, "\\newpage" 
  
